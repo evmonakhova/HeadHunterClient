@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/vacancy_item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="@dimen/item_padding">
+
+    <TextView android:id="@+id/vacancy_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Vacancy title"
+        style="@style/PrimaryTextStyle"/>
+
+    <TextView android:id="@+id/salary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Salary"
+        style="@style/SecondaryTextStyle"/>
+
+    <TextView android:id="@+id/company_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Company, City, Subway Station"
+        android:paddingBottom="20dp"
+        style="@style/SecondaryTextStyle"/>
+
+</LinearLayout>
