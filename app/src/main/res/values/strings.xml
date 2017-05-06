@@ -1,4 +1,8 @@
 <resources>
+
     <string name="app_name">HeadHunterClient</string>
+
     <string name="search_hint">Search</string>
+    <string name="download_more">Download more</string>
+
 </resources>

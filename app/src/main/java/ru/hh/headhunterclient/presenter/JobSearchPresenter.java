@@ -51,4 +51,9 @@ public class JobSearchPresenter implements IPresenter {
     public void attachView(IView view) {
         mView = view;
     }
+
+    @Override
+    public void requestJobs(String keyword) {
+        //todo: implement callback
+    }
 }

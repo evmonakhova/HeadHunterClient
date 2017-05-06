@@ -18,10 +18,10 @@ import ru.hh.headhunterclient.model.Vacancy;
 
 public class JobListAdapter extends RecyclerView.Adapter<JobListAdapter.ViewHolder> {
 
-    private List<Vacancy> mVacancies;
+    private List<Vacancy> items;
 
     public JobListAdapter() {
-        mVacancies = new ArrayList<>();
+        items = new ArrayList<>();
     }
 
     @Override
@@ -33,8 +33,8 @@ public class JobListAdapter extends RecyclerView.Adapter<JobListAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        if(holder == null || mVacancies == null ||
-                (position < 0 || position >= mVacancies.size())) {
+        if(holder == null || items == null ||
+                (position < 0 || position >= items.size())) {
             return;
         }
         Vacancy item = getItem(position);
@@ -45,19 +45,25 @@ public class JobListAdapter extends RecyclerView.Adapter<JobListAdapter.ViewHold
 
     @Override
     public int getItemCount() {
-        return mVacancies.size();
+        return items.size();
     }
 
-    public void addData(List<Vacancy> vacancies) {
-        mVacancies.addAll(vacancies);
+    public void clear() {
+        items.clear();
         notifyDataSetChanged();
     }
 
-    public Vacancy getItem(int position) {
+
+    public void addAll(List<Vacancy> vacancies) {
+        items.addAll(vacancies);
+        notifyDataSetChanged();
+    }
+
+    private Vacancy getItem(int position) {
         Vacancy item = null;
-        if(position >= 0 && position < mVacancies.size()
-                && mVacancies.get(position) != null) {
-            item = mVacancies.get(position);
+        if(position >= 0 && position < items.size()
+                && items.get(position) != null) {
+            item = items.get(position);
         }
         return item;
     }
@@ -68,7 +74,7 @@ public class JobListAdapter extends RecyclerView.Adapter<JobListAdapter.ViewHold
         TextView mSalary;
         TextView mCompanyInfo;
 
-        public ViewHolder(View itemView) {
+        ViewHolder(View itemView) {
             super(itemView);
             itemView.setFocusable(true);
 
@@ -77,7 +83,7 @@ public class JobListAdapter extends RecyclerView.Adapter<JobListAdapter.ViewHold
             mCompanyInfo = (TextView) itemView.findViewById(R.id.company_info);
         }
 
-        public void bind(Vacancy item) {
+        void bind(Vacancy item) {
             if (item != null) {
                 mJobTitle.setText(item.getJobTitle());
                 mSalary.setText(item.getSalary());

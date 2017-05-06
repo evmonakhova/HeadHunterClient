@@ -10,8 +10,11 @@ import ru.hh.headhunterclient.model.Vacancy;
 
 public interface IView {
 
+    void clear();
+
     void loadItems(List<Vacancy> vacancies);
 
     void showProgress(boolean show);
 
+    void stopRefreshing();
 }

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -30,8 +31,11 @@ public class JobSearchFragment extends Fragment implements IView {
 
     private static final String TAG = JobSearchFragment.class.getName();
 
+    private static final String KEYWORD = "Android developer";
+
     private Activity mActivity;
     private JobListAdapter mJobListAdapter;
+    private SwipeRefreshLayout mSwipeContainer;
     private ProgressBar mProgressBar;
     private IPresenter mPresenter;
 
@@ -64,6 +68,8 @@ public class JobSearchFragment extends Fragment implements IView {
         Toolbar mActionBarToolbar = (Toolbar) view.findViewById(R.id.toolbar_actionbar);
         ((AppCompatActivity)mActivity).setSupportActionBar(mActionBarToolbar);
 
+        mSwipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
+
         RecyclerView mJobList = (RecyclerView) view.findViewById(R.id.job_list);
         mJobList.setLayoutManager(new LinearLayoutManager(mActivity));
         mJobList.setHasFixedSize(false);
@@ -80,13 +86,31 @@ public class JobSearchFragment extends Fragment implements IView {
     public void onStart(){
         super.onStart();
         mPresenter.onStart();
+        mSwipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mPresenter.requestJobs(KEYWORD);
+            }
+        });
+    }
+
+    @Override
+    public void clear() {
+        if (mJobListAdapter != null) {
+            mJobListAdapter.clear();
+        }
     }
 
     @Override
     public void loadItems(List<Vacancy> vacancies) {
         if (mJobListAdapter != null) {
-            mJobListAdapter.addData(vacancies);
+            mJobListAdapter.addAll(vacancies);
         }
+    }
+
+    @Override
+    public void stopRefreshing() {
+        mSwipeContainer.setRefreshing(false);
     }
 
     @Override
