@@ -1,4 +1,4 @@
-package ru.hh.headhunterclient.view;
+package ru.hh.headhunterclient.view.recyclerview;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -70,6 +70,8 @@ public class JobListAdapter extends RecyclerView.Adapter<JobListAdapter.ViewHold
 
         public ViewHolder(View itemView) {
             super(itemView);
+            itemView.setFocusable(true);
+
             mJobTitle = (TextView) itemView.findViewById(R.id.vacancy_title);
             mSalary = (TextView) itemView.findViewById(R.id.salary);
             mCompanyInfo = (TextView) itemView.findViewById(R.id.company_info);

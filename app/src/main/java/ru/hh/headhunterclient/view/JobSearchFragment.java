@@ -8,7 +8,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +19,8 @@ import ru.hh.headhunterclient.R;
 import ru.hh.headhunterclient.model.Vacancy;
 import ru.hh.headhunterclient.presenter.IPresenter;
 import ru.hh.headhunterclient.presenter.JobSearchPresenter;
+import ru.hh.headhunterclient.view.recyclerview.DividerItemDecoration;
+import ru.hh.headhunterclient.view.recyclerview.JobListAdapter;
 
 /**
  * Created by alena on 06.05.2017.
@@ -68,6 +69,7 @@ public class JobSearchFragment extends Fragment implements IView {
         mJobList.setHasFixedSize(false);
         mJobList.setItemViewCacheSize(20);
         mJobList.setAdapter(mJobListAdapter);
+        mJobList.addItemDecoration(new DividerItemDecoration(getActivity()));
 
         mProgressBar = (ProgressBar) view.findViewById(R.id.progress);
 
