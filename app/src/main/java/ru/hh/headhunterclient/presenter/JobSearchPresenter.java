@@ -7,9 +7,12 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import com.google.gson.Gson;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.hh.headhunterclient.model.SearchData;
 import ru.hh.headhunterclient.model.Vacancy;
 import ru.hh.headhunterclient.net.HttpLoader;
 import ru.hh.headhunterclient.view.IView;
@@ -55,10 +58,13 @@ public class JobSearchPresenter implements IPresenter, LoaderManager.LoaderCallb
     }
 
     @Override
-    public void onLoadFinished(Loader<String> loader, String data) {
+    public void onLoadFinished(Loader<String> loader, String json) {
         //todo: parse json
-        //mView.loadItems(vacancies);
-        Log.d(TAG, String.format("\n ------------ \n onLoadFinished. data: \n %s \n", data));
+        Log.d(TAG, String.format("\n ------------ \n onLoadFinished. data: \n %s \n", json));
+        Gson gson = new Gson();
+        SearchData data = gson.fromJson(json, SearchData.class);
+        Log.d(TAG, String.format("\n ------------ \n onLoadFinished. data: \n %s \n", data.toString()));
+        mView.loadItems(data.getItems());
         mView.stopRefreshing();
     }
 

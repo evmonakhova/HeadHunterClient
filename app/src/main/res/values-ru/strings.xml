@@ -3,4 +3,5 @@
     <string name="app_name">HeadHunterClient</string>
     <string name="search_hint">Поиск</string>
     <string name="download_more">Загрузить еще</string>
+    <string name="unknown_salary">з/п не указана</string>
 </resources>

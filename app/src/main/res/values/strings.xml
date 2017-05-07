@@ -4,5 +4,6 @@
 
     <string name="search_hint">Search</string>
     <string name="download_more">Download more</string>
+    <string name="unknown_salary">Salary is unknown</string>
 
 </resources>

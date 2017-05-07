@@ -1,63 +1,95 @@
 package ru.hh.headhunterclient.model;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Created by alena on 06.05.2017.
  */
 
 public class Vacancy {
 
-    private String jobTitle;
-    private String salary;
-    private String companyName;
-    private String city;
-    private String subwayStation;
+    @SerializedName("id")
+    private String id;
+    @SerializedName("premium")
+    private boolean premium;
+    @SerializedName("address")
+    private Address address;
+    @SerializedName("alternate_url")
+    private String alternateUrl;
+    @SerializedName("apply_alternate_url")
+    private String applyAlternateUrl;
+    @SerializedName("department")
+    private Department department;
+    @SerializedName("salary")
+    private Salary salary;
+    @SerializedName("name")
+    private String name;
+    @SerializedName("area")
+    private Area area;
+    @SerializedName("url")
+    private String url;
+    @SerializedName("published_at")
+    private String publishedAt;
+    @SerializedName("employer")
+    private Employer employer;
+    @SerializedName("response_letter_required")
+    private boolean responseLetterRequired;
+    @SerializedName("type")
+    private Type type;
+    @SerializedName("archived")
+    private boolean archived;
+    @SerializedName("snippet")
+    private Snippet snippet;
 
-    public Vacancy(String jobTitle, String salary, String companyName, String city, String subwayStation) {
-        this.jobTitle = jobTitle;
-        this.salary = salary;
-        this.companyName = companyName;
-        this.city = city;
-        this.subwayStation = subwayStation;
+    public Address getAddress() {
+        return address;
     }
 
-    public String getJobTitle() {
-        return jobTitle;
+    public Department getDepartment() {
+        return department;
     }
 
-    public String getSalary() {
+    public Salary getSalary() {
         return salary;
     }
 
-    public String getCompanyName() {
-        return companyName;
+    public String getName() {
+        return name;
     }
 
-    public String getCity() {
-        return city;
+    public Area getArea() {
+        return area;
     }
 
-    public String getSubwayStation() {
-        return subwayStation;
+    public Employer getEmployer() {
+        return employer;
     }
 
-    public void setJobTitle(String jobTitle) {
-        this.jobTitle = jobTitle;
-    }
+    @Override
+    public String toString() {
+        String addressStr = address == null ? "" : address.toString();
+        String departmentStr = department == null ? "" : department.toString();
+        String salaryStr = salary == null ? "" : salary.toString();
+        String areaStr = area == null ? "" : area.toString();
+        String employerStr = employer == null ? "" : employer.toString();
+        String typeStr = type == null ? "" : type.toString();
 
-    public void setSalary(String salary) {
-        this.salary = salary;
+        return "Vacancy{" +
+                "id='" + id + '\'' +
+                ", premium=" + premium +
+                ", address=" + addressStr +
+                ", alternateUrl='" + alternateUrl + '\'' +
+                ", applyAlternateUrl='" + applyAlternateUrl + '\'' +
+                ", department=" + departmentStr +
+                ", salary=" + salaryStr +
+                ", name='" + name + '\'' +
+                ", area=" + areaStr +
+                ", url='" + url + '\'' +
+                ", publishedAt='" + publishedAt + '\'' +
+                ", employer=" + employerStr +
+                ", responseLetterRequired=" + responseLetterRequired +
+                ", type=" + typeStr +
+                ", archived=" + archived +
+                '}';
     }
-
-    public void setCompanyName(String companyName) {
-        this.companyName = companyName;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public void setSubwayStation(String subwayStation) {
-        this.subwayStation = subwayStation;
-    }
-
 }

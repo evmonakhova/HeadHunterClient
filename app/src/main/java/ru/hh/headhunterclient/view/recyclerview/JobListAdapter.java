@@ -10,6 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ru.hh.headhunterclient.R;
+import ru.hh.headhunterclient.model.Address;
+import ru.hh.headhunterclient.model.Area;
+import ru.hh.headhunterclient.model.Department;
+import ru.hh.headhunterclient.model.Employer;
+import ru.hh.headhunterclient.model.Metro;
+import ru.hh.headhunterclient.model.Salary;
 import ru.hh.headhunterclient.model.Vacancy;
 
 /**
@@ -70,7 +76,7 @@ public class JobListAdapter extends RecyclerView.Adapter<JobListAdapter.ViewHold
 
     static class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView mJobTitle;
+        TextView mVacancyTitle;
         TextView mSalary;
         TextView mCompanyInfo;
 
@@ -78,19 +84,46 @@ public class JobListAdapter extends RecyclerView.Adapter<JobListAdapter.ViewHold
             super(itemView);
             itemView.setFocusable(true);
 
-            mJobTitle = (TextView) itemView.findViewById(R.id.vacancy_title);
+            mVacancyTitle = (TextView) itemView.findViewById(R.id.vacancy_title);
             mSalary = (TextView) itemView.findViewById(R.id.salary);
             mCompanyInfo = (TextView) itemView.findViewById(R.id.company_info);
         }
 
         void bind(Vacancy item) {
             if (item != null) {
-                mJobTitle.setText(item.getJobTitle());
-                mSalary.setText(item.getSalary());
+                Salary salary = item.getSalary();
+                Employer employer = item.getEmployer();
+                Department department = item.getDepartment();
+                Area area = item.getArea();
+                Address address = item.getAddress();
+
+                mVacancyTitle.setText(item.getName());
+                if (salary == null) {
+                    mSalary.setText(R.string.unknown_salary);
+                } else {
+                    mSalary.setText(salary.toString());
+                }
+
                 StringBuffer sbInfo = new StringBuffer();
-                sbInfo.append(item.getCompanyName())
-                        .append(", ").append(item.getCity())
-                        .append(", ").append(item.getSubwayStation());
+                if (employer != null) {
+                    sbInfo.append(employer.getName());
+                }
+                if (department != null){
+                    sbInfo.append("::").append(department.getName());
+                }
+                sbInfo.append(", ");
+                if (area != null) {
+                    sbInfo.append(area.getName());
+                }
+                if (address != null) {
+                    Metro metro = address.getMetro();
+                    if (metro != null){
+                        String metroName = metro.getName();
+                        if (metroName != null) {
+                            sbInfo.append(", ").append(metroName);
+                        }
+                    }
+                }
                 mCompanyInfo.setText(sbInfo);
             }
         }
