@@ -28,7 +28,6 @@ public class JobSearchPresenter implements IPresenter, LoaderManager.LoaderCallb
     private IView mView;
     private Context mContext;
     private HttpLoader mHttpLoader;
-    private List<Vacancy> vacancies = new ArrayList<>();
 
     public JobSearchPresenter(Context context) {
         mContext = context;
@@ -39,6 +38,7 @@ public class JobSearchPresenter implements IPresenter, LoaderManager.LoaderCallb
         mHttpLoader = (HttpLoader) ((AppCompatActivity)mContext)
                 .getSupportLoaderManager()
                 .initLoader(0, null, this);
+        mHttpLoader.forceLoad();
     }
 
     @Override
@@ -49,6 +49,11 @@ public class JobSearchPresenter implements IPresenter, LoaderManager.LoaderCallb
     @Override
     public void requestJobs(String keyword) {
 //        mHttpLoader.setKeyword(keyword);
+        if (mHttpLoader == null) {
+            mHttpLoader = (HttpLoader) ((AppCompatActivity)mContext)
+                    .getSupportLoaderManager()
+                    .initLoader(0, null, this);
+        }
         mHttpLoader.forceLoad();
     }
 
@@ -59,17 +64,15 @@ public class JobSearchPresenter implements IPresenter, LoaderManager.LoaderCallb
 
     @Override
     public void onLoadFinished(Loader<String> loader, String json) {
-        //todo: parse json
-        Log.d(TAG, String.format("\n ------------ \n onLoadFinished. data: \n %s \n", json));
         Gson gson = new Gson();
         SearchData data = gson.fromJson(json, SearchData.class);
-        Log.d(TAG, String.format("\n ------------ \n onLoadFinished. data: \n %s \n", data.toString()));
+        mView.clear();
         mView.loadItems(data.getItems());
         mView.stopRefreshing();
     }
 
     @Override
     public void onLoaderReset(Loader<String> loader) {
-
+        mView.clear();
     }
 }

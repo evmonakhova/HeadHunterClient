@@ -56,6 +56,7 @@ public class JobSearchFragment extends Fragment implements IView {
         super.onCreate(savedState);
         setRetainInstance(true);
         mJobListAdapter = new JobListAdapter();
+        mPresenter.onCreate();
     }
 
     @Override
@@ -83,7 +84,6 @@ public class JobSearchFragment extends Fragment implements IView {
 
         mProgressBar = (ProgressBar) view.findViewById(R.id.progress);
 
-        mPresenter.onCreate();
         return view;
     }
 
