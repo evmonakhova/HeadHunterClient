@@ -31,7 +31,7 @@ public class JobSearchFragment extends Fragment implements IView {
 
     private static final String TAG = JobSearchFragment.class.getName();
 
-    private static final String KEYWORD = "Android developer";
+//    private static final String KEYWORD = "Android";
 
     private Activity mActivity;
     private JobListAdapter mJobListAdapter;
@@ -47,7 +47,7 @@ public class JobSearchFragment extends Fragment implements IView {
     public void onAttach(Context context) {
         super.onAttach(context);
         this.mActivity = getActivity();
-        this.mPresenter = new JobSearchPresenter();
+        this.mPresenter = new JobSearchPresenter(mActivity);
         mPresenter.attachView(this);
     }
 
@@ -61,14 +61,18 @@ public class JobSearchFragment extends Fragment implements IView {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle state) {
-        mPresenter.onCreate();
-
         View view = inflater.inflate(R.layout.fragment_job_search, container, false);
 
         Toolbar mActionBarToolbar = (Toolbar) view.findViewById(R.id.toolbar_actionbar);
         ((AppCompatActivity)mActivity).setSupportActionBar(mActionBarToolbar);
 
         mSwipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
+        mSwipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mPresenter.requestJobs("");
+            }
+        });
 
         RecyclerView mJobList = (RecyclerView) view.findViewById(R.id.job_list);
         mJobList.setLayoutManager(new LinearLayoutManager(mActivity));
@@ -79,19 +83,8 @@ public class JobSearchFragment extends Fragment implements IView {
 
         mProgressBar = (ProgressBar) view.findViewById(R.id.progress);
 
+        mPresenter.onCreate();
         return view;
-    }
-
-    @Override
-    public void onStart(){
-        super.onStart();
-        mPresenter.onStart();
-        mSwipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                mPresenter.requestJobs(KEYWORD);
-            }
-        });
     }
 
     @Override

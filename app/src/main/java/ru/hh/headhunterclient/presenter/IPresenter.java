@@ -1,8 +1,5 @@
 package ru.hh.headhunterclient.presenter;
 
-import java.util.List;
-
-import ru.hh.headhunterclient.model.Vacancy;
 import ru.hh.headhunterclient.view.IView;
 
 /**
@@ -13,16 +10,13 @@ public interface IPresenter<T extends IView> {
 
     void onCreate();
 
-    void onStart();
-
     void attachView(T view);
 
-    interface OnJobListReceivedListener {
-        void onServerError(String message);
-        void onSuccess(List<Vacancy> vacancies);
-    }
+//    interface OnJobListReceivedListener {
+//        void onServerError(String message);
+//        void onSuccess(List<Vacancy> vacancies);
+//    }
 
-//    void requestJobs(String keyword, OnJobListReceivedListener onJobsReceived);
     void requestJobs(String keyword);
 
 }

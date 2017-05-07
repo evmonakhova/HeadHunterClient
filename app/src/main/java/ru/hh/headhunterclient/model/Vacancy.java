@@ -40,4 +40,24 @@ public class Vacancy {
         return subwayStation;
     }
 
+    public void setJobTitle(String jobTitle) {
+        this.jobTitle = jobTitle;
+    }
+
+    public void setSalary(String salary) {
+        this.salary = salary;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public void setSubwayStation(String subwayStation) {
+        this.subwayStation = subwayStation;
+    }
+
 }
