@@ -21,6 +21,7 @@ import ru.hh.headhunterclient.model.Vacancy;
 import ru.hh.headhunterclient.presenter.IPresenter;
 import ru.hh.headhunterclient.presenter.JobSearchPresenter;
 import ru.hh.headhunterclient.view.recyclerview.DividerItemDecoration;
+import ru.hh.headhunterclient.view.recyclerview.EndlessRecyclerViewScrollListener;
 import ru.hh.headhunterclient.view.recyclerview.JobListAdapter;
 
 /**
@@ -76,11 +77,20 @@ public class JobSearchFragment extends Fragment implements IView {
         });
 
         RecyclerView mJobList = (RecyclerView) view.findViewById(R.id.job_list);
-        mJobList.setLayoutManager(new LinearLayoutManager(mActivity));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(mActivity);
+        EndlessRecyclerViewScrollListener scrollListener
+                = new EndlessRecyclerViewScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int page) {
+                mPresenter.loadMore(page);
+            }
+        };
+        mJobList.setLayoutManager(layoutManager);
         mJobList.setHasFixedSize(false);
         mJobList.setItemViewCacheSize(20);
         mJobList.setAdapter(mJobListAdapter);
         mJobList.addItemDecoration(new DividerItemDecoration(getActivity()));
+        mJobList.addOnScrollListener(scrollListener);
 
         mProgressBar = (ProgressBar) view.findViewById(R.id.progress);
 

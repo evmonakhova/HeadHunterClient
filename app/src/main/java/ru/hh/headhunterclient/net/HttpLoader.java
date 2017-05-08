@@ -21,10 +21,12 @@ public class HttpLoader extends AsyncTaskLoader<String> {
 
     private static final String TAG = HttpLoader.class.getSimpleName();
 
-    private static final String BASE_URL = "https://api.hh.ru/";
+    private static final String BASE_URL = "https://api.hh.ru/vacancies";
     private static final String KEYWORD = "Android";
+    private static final String PER_PAGE = "20";
 
     private String mKeyword;
+    private int mPage = 0;
 
     public HttpLoader(Context context) {
         super(context);
@@ -36,13 +38,15 @@ public class HttpLoader extends AsyncTaskLoader<String> {
         String response;
 
         try {
-            URI uri = buildURI(BASE_URL, "text", KEYWORD);
+            URI uri = buildURI(BASE_URL, KEYWORD, mPage, PER_PAGE);
             Log.d(TAG, String.format("loadInBackground. path: %s", uri.toURL()));
             URL url = uri.toURL();
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
             urlConnection.connect();
+
             response = readResponse(urlConnection);
+
         } catch (URISyntaxException uriEx) {
             Log.e(TAG, "URISyntaxException ", uriEx);
             return null;
@@ -66,10 +70,16 @@ public class HttpLoader extends AsyncTaskLoader<String> {
         mKeyword = keyword;
     }
 
-    private URI buildURI(String uri, String key, String value) throws URISyntaxException {
+    public void setPage(int page) {
+        mPage = page;
+    }
+
+    private URI buildURI(String uri, String keyword, int page, String perPage)
+            throws URISyntaxException {
         StringBuilder newUri = new StringBuilder(uri);
-        newUri.append("vacancies").append("?")
-                .append(key).append("=").append(value);
+        newUri.append("?text=").append(keyword)
+                .append("&page=").append(page)
+                .append("&perPage=").append(perPage);
         return new URI(newUri.toString());
     }
 

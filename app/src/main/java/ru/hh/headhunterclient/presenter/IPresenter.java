@@ -12,11 +12,7 @@ public interface IPresenter<T extends IView> {
 
     void attachView(T view);
 
-//    interface OnJobListReceivedListener {
-//        void onServerError(String message);
-//        void onSuccess(List<Vacancy> vacancies);
-//    }
-
     void requestJobs(String keyword);
 
+    void loadMore(int page);
 }

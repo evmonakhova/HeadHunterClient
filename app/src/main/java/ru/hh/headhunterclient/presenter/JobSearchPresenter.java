@@ -9,11 +9,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import ru.hh.headhunterclient.model.SearchData;
-import ru.hh.headhunterclient.model.Vacancy;
 import ru.hh.headhunterclient.net.HttpLoader;
 import ru.hh.headhunterclient.view.IView;
 
@@ -49,11 +45,19 @@ public class JobSearchPresenter implements IPresenter, LoaderManager.LoaderCallb
     @Override
     public void requestJobs(String keyword) {
 //        mHttpLoader.setKeyword(keyword);
-        if (mHttpLoader == null) {
-            mHttpLoader = (HttpLoader) ((AppCompatActivity)mContext)
-                    .getSupportLoaderManager()
-                    .initLoader(0, null, this);
+        initLoader();
+        mView.clear();
+        mHttpLoader.forceLoad();
+    }
+
+    @Override
+    public void loadMore(int page) {
+        if (page*20 >= 2000){
+            return;
         }
+        initLoader();
+        mView.showProgress(true);
+        mHttpLoader.setPage(page);
         mHttpLoader.forceLoad();
     }
 
@@ -66,13 +70,21 @@ public class JobSearchPresenter implements IPresenter, LoaderManager.LoaderCallb
     public void onLoadFinished(Loader<String> loader, String json) {
         Gson gson = new Gson();
         SearchData data = gson.fromJson(json, SearchData.class);
-        mView.clear();
         mView.loadItems(data.getItems());
         mView.stopRefreshing();
+        mView.showProgress(false);
     }
 
     @Override
     public void onLoaderReset(Loader<String> loader) {
         mView.clear();
+    }
+
+    private void initLoader() {
+        if (mHttpLoader == null) {
+            mHttpLoader = (HttpLoader) ((AppCompatActivity)mContext)
+                    .getSupportLoaderManager()
+                    .initLoader(0, null, this);
+        }
     }
 }
