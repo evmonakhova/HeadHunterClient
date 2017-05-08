@@ -1,17 +1,29 @@
 package ru.hh.headhunterclient.model;
 
-import com.google.gson.annotations.SerializedName;
-
 /**
  * Created by alena on 08.05.2017.
  */
 
 public class Snippet {
 
-    @SerializedName("requirement")
     private String requirement;
-    @SerializedName("responsibility")
     private String responsibility;
+
+    public String getRequirement() {
+        return requirement;
+    }
+
+    public void setRequirement(String requirement) {
+        this.requirement = requirement;
+    }
+
+    public String getResponsibility() {
+        return responsibility;
+    }
+
+    public void setResponsibility(String responsibility) {
+        this.responsibility = responsibility;
+    }
 
     @Override
     public String toString() {

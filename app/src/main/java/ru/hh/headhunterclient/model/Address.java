@@ -1,45 +1,86 @@
 package ru.hh.headhunterclient.model;
 
-import com.google.gson.annotations.SerializedName;
-
-import java.util.List;
-
 /**
  * Created by alena on 07.05.2017.
  */
 
 public class Address {
 
-    @SerializedName("id")
-    private Long id;
-    @SerializedName("city")
+    private Integer id;
     private String city;
-    @SerializedName("street")
     private String street;
-    @SerializedName("building")
     private String building;
-    @SerializedName("description")
     private String description;
-    @SerializedName("lat")
     private Double lat;
-    @SerializedName("lng")
     private Double lng;
-    @SerializedName("metro")
     private Metro metro;
-    @SerializedName("metro_stations")
-    private List<Metro> metroStations;
 
-    public Long getId() {
+    public Integer getId() {
         return id;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public String getStreet() {
+        return street;
+    }
+
+    public String getBuilding() {
+        return building;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public Double getLat() {
+        return lat;
+    }
+
+    public Double getLng() {
+        return lng;
     }
 
     public Metro getMetro() {
         return metro;
     }
 
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public void setStreet(String street) {
+        this.street = street;
+    }
+
+    public void setBuilding(String building) {
+        this.building = building;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setLat(Double lat) {
+        this.lat = lat;
+    }
+
+    public void setLng(Double lng) {
+        this.lng = lng;
+    }
+
+    public void setMetro(Metro metro) {
+        this.metro = metro;
+    }
+
     @Override
     public String toString() {
-        String metroStationsStr = metroStations == null ? "" : metroStations.toString();
         return "Address{" +
                 "city='" + city + '\'' +
                 ", street='" + street + '\'' +
@@ -48,7 +89,6 @@ public class Address {
                 ", lat=" + lat +
                 ", lng=" + lng +
                 ", metro=" + metro +
-                ", metroStations=" + metroStationsStr +
                 '}';
     }
 }

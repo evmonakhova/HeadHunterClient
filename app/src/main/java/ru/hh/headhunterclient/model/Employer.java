@@ -8,13 +8,9 @@ import com.google.gson.annotations.SerializedName;
 
 public class Employer {
 
-    @SerializedName("id")
     private int id;
-    @SerializedName("name")
     private String name;
-    @SerializedName("trusted")
     private boolean trusted;
-    @SerializedName("url")
     private String url;
     @SerializedName("alternate_url")
     private String alternateUrl;
@@ -23,12 +19,60 @@ public class Employer {
     @SerializedName("logo_urls")
     private LogoUrls logoUrls;
 
+    public int getId() {
+        return id;
+    }
+
     public String getName() {
         return name;
     }
 
     public boolean isTrusted() {
         return trusted;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public String getAlternateUrl() {
+        return alternateUrl;
+    }
+
+    public String getVacanciesUrl() {
+        return vacanciesUrl;
+    }
+
+    public LogoUrls getLogoUrls() {
+        return logoUrls;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setTrusted(boolean trusted) {
+        this.trusted = trusted;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public void setAlternateUrl(String alternateUrl) {
+        this.alternateUrl = alternateUrl;
+    }
+
+    public void setVacanciesUrl(String vacanciesUrl) {
+        this.vacanciesUrl = vacanciesUrl;
+    }
+
+    public void setLogoUrls(LogoUrls logoUrls) {
+        this.logoUrls = logoUrls;
     }
 
     @Override

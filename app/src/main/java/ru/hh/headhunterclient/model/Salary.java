@@ -1,30 +1,37 @@
 package ru.hh.headhunterclient.model;
 
-import com.google.gson.annotations.SerializedName;
-
 /**
  * Created by alena on 07.05.2017.
  */
 
 public class Salary {
 
-    @SerializedName("from")
     private Integer from;
-    @SerializedName("to")
     private Integer to;
-    @SerializedName("currency")
     private String currency;
 
-    public int getFrom() {
+    public Integer getFrom() {
         return from;
     }
 
-    public int getTo() {
+    public Integer getTo() {
         return to;
     }
 
     public String getCurrency() {
         return currency;
+    }
+
+    public void setFrom(Integer from) {
+        this.from = from;
+    }
+
+    public void setTo(Integer to) {
+        this.to = to;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
     }
 
     @Override

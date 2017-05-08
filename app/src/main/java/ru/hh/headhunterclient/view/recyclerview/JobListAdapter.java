@@ -118,7 +118,7 @@ public class JobListAdapter extends RecyclerView.Adapter<JobListAdapter.ViewHold
                 if (address != null) {
                     Metro metro = address.getMetro();
                     if (metro != null){
-                        String metroName = metro.getName();
+                        String metroName = metro.getStationName();
                         if (metroName != null) {
                             sbInfo.append(", м. ").append(metroName);
                         }

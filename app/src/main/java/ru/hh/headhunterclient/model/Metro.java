@@ -13,16 +13,58 @@ public class Metro {
     @SerializedName("station_name")
     private String stationName;
     @SerializedName("line_id")
-    private Long lineId;
+    private Integer lineId;
     @SerializedName("line_name")
     private String lineName;
-    @SerializedName("lat")
     private Double lat;
-    @SerializedName("lng")
     private Double lng;
 
-    public String getName() {
+    public Double getStationId() {
+        return stationId;
+    }
+
+    public String getStationName() {
         return stationName;
+    }
+
+    public Integer getLineId() {
+        return lineId;
+    }
+
+    public String getLineName() {
+        return lineName;
+    }
+
+    public Double getLat() {
+        return lat;
+    }
+
+    public Double getLng() {
+        return lng;
+    }
+
+    public void setStationId(Double stationId) {
+        this.stationId = stationId;
+    }
+
+    public void setStationName(String stationName) {
+        this.stationName = stationName;
+    }
+
+    public void setLineId(Integer lineId) {
+        this.lineId = lineId;
+    }
+
+    public void setLineName(String lineName) {
+        this.lineName = lineName;
+    }
+
+    public void setLat(Double lat) {
+        this.lat = lat;
+    }
+
+    public void setLng(Double lng) {
+        this.lng = lng;
     }
 
     @Override

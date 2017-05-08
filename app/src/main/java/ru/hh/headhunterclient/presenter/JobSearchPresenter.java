@@ -5,12 +5,21 @@ import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 
 import com.google.gson.Gson;
 
+import java.util.List;
+
+import ru.hh.headhunterclient.cache.orm.AddressORM;
+import ru.hh.headhunterclient.cache.orm.AreaORM;
+import ru.hh.headhunterclient.cache.orm.EmployerORM;
+import ru.hh.headhunterclient.cache.orm.MetroORM;
+import ru.hh.headhunterclient.cache.orm.VacancyORM;
+import ru.hh.headhunterclient.loaders.CacheDataAsyncTask;
+import ru.hh.headhunterclient.model.Address;
 import ru.hh.headhunterclient.model.SearchData;
-import ru.hh.headhunterclient.net.HttpLoader;
+import ru.hh.headhunterclient.model.Vacancy;
+import ru.hh.headhunterclient.loaders.HttpLoader;
 import ru.hh.headhunterclient.view.IView;
 
 /**
@@ -31,9 +40,7 @@ public class JobSearchPresenter implements IPresenter, LoaderManager.LoaderCallb
 
     @Override
     public void onCreate() {
-        mHttpLoader = (HttpLoader) ((AppCompatActivity)mContext)
-                .getSupportLoaderManager()
-                .initLoader(0, null, this);
+        initHttpLoader();
         mHttpLoader.forceLoad();
     }
 
@@ -45,7 +52,7 @@ public class JobSearchPresenter implements IPresenter, LoaderManager.LoaderCallb
     @Override
     public void requestJobs(String keyword) {
 //        mHttpLoader.setKeyword(keyword);
-        initLoader();
+        initHttpLoader();
         mView.clear();
         mHttpLoader.forceLoad();
     }
@@ -55,7 +62,7 @@ public class JobSearchPresenter implements IPresenter, LoaderManager.LoaderCallb
         if (page*20 >= 2000){
             return;
         }
-        initLoader();
+        initHttpLoader();
         mView.showProgress(true);
         mHttpLoader.setPage(page);
         mHttpLoader.forceLoad();
@@ -70,9 +77,12 @@ public class JobSearchPresenter implements IPresenter, LoaderManager.LoaderCallb
     public void onLoadFinished(Loader<String> loader, String json) {
         Gson gson = new Gson();
         SearchData data = gson.fromJson(json, SearchData.class);
-        mView.loadItems(data.getItems());
+        List<Vacancy> items = data.getItems();
+        mView.loadItems(items);
         mView.stopRefreshing();
         mView.showProgress(false);
+        CacheDataAsyncTask cacheDataAsyncTask = new CacheDataAsyncTask(mContext);
+        cacheDataAsyncTask.executeContent(items);
     }
 
     @Override
@@ -80,7 +90,7 @@ public class JobSearchPresenter implements IPresenter, LoaderManager.LoaderCallb
         mView.clear();
     }
 
-    private void initLoader() {
+    private void initHttpLoader() {
         if (mHttpLoader == null) {
             mHttpLoader = (HttpLoader) ((AppCompatActivity)mContext)
                     .getSupportLoaderManager()

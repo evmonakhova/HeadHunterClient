@@ -8,15 +8,32 @@ import com.google.gson.annotations.SerializedName;
 
 public class Area {
 
-    @SerializedName("id")
-    private Long id;
-    @SerializedName("url")
+    private Integer id;
     private String url;
-    @SerializedName("name")
     private String name;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public String getUrl() {
+        return url;
+    }
 
     public String getName() {
         return name;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override

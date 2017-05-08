@@ -1,4 +1,4 @@
-package ru.hh.headhunterclient.net;
+package ru.hh.headhunterclient.loaders;
 
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;

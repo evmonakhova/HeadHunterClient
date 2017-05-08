@@ -10,17 +10,12 @@ import java.util.List;
 
 public class SearchData {
 
-    @SerializedName("clusters")
     private String clusters;
-    @SerializedName("items")
     private List<Vacancy> items;
-    @SerializedName("page")
     private int page;
     @SerializedName("per_page")
     private int perPage;
-    @SerializedName("pages")
     private int pages;
-    @SerializedName("found")
     private int found;
 
     public List<Vacancy> getItems() {
