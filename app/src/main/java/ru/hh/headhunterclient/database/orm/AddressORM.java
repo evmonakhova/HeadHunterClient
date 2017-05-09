@@ -1,15 +1,13 @@
-package ru.hh.headhunterclient.cache.orm;
+package ru.hh.headhunterclient.database.orm;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.LinkAddress;
 import android.util.Log;
 
-import ru.hh.headhunterclient.cache.DatabaseWrapper;
+import ru.hh.headhunterclient.database.DatabaseWrapper;
 import ru.hh.headhunterclient.model.Address;
-import ru.hh.headhunterclient.model.Area;
 import ru.hh.headhunterclient.model.Metro;
 
 /**
@@ -51,18 +49,18 @@ public class AddressORM {
             "DROP TABLE IF EXISTS " + TABLE_NAME;
 
     public static Address findAddressById(Context context, Integer addressId) {
-        DatabaseWrapper databaseWrapper = new DatabaseWrapper(context);
+        DatabaseWrapper databaseWrapper = DatabaseWrapper.getInstance(context);
         SQLiteDatabase database = databaseWrapper.getReadableDatabase();
 
         Address address = null;
         if (database != null) {
-            Log.i(TAG, String.format("Loading address [%s]", addressId));
+//            Log.d(TAG, String.format("Loading address [%s]", addressId));
             Cursor cursor = database.rawQuery(String.format("SELECT * FROM %s WHERE %s = %s",
                     TABLE_NAME, COLUMN_ID, addressId), null);
             if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
                 address = cursorToAddress(cursor);
-                Log.i(TAG, "Address loaded successfully!");
+//                Log.d(TAG, "Address loaded successfully!");
             }
             database.close();
         }
@@ -73,18 +71,18 @@ public class AddressORM {
     public static void insertAddress(Context context, Address address) {
         if (address != null) {
             if (findAddressById(context, address.getId()) != null) {
-                Log.i(TAG, "Address already exists in database, not inserting!");
+//                Log.d(TAG, "Address already exists in database, not inserting!");
                 return;
             }
 
             ContentValues addressValues = addressToContentValues(address);
-            DatabaseWrapper databaseWrapper = new DatabaseWrapper(context);
+            DatabaseWrapper databaseWrapper = DatabaseWrapper.getInstance(context);
             SQLiteDatabase database = databaseWrapper.getWritableDatabase();
 
             try {
                 if (database != null) {
                     long addressId = database.insert(TABLE_NAME, "null", addressValues);
-                    Log.i(TAG, String.format("Inserted new Address with ID: %s", addressId));
+//                    Log.d(TAG, String.format("Inserted new Address with ID: %s", addressId));
                 }
             } catch (NullPointerException ex) {
                 Log.i(TAG, String.format("Failed to insert Address with ID: %s", address.getId()));

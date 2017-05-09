@@ -5,7 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import ru.hh.headhunterclient.utils.FragmentHelper;
-import ru.hh.headhunterclient.view.JobSearchFragment;
+import ru.hh.headhunterclient.view.VacancySearchFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -15,11 +15,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         FragmentHelper fragmentHelper = new FragmentHelper(getSupportFragmentManager());
-        String tag = "JOB_SEARCH_FR";
+        String tag = "VACANCY_SEARCH_FR";
         Fragment fragment = fragmentHelper.getFragmentByTag(tag);
 
         if (fragment == null) {
-            fragment = JobSearchFragment.newInstance();
+            fragment = VacancySearchFragment.newInstance();
             fragmentHelper.addFragment(fragment, tag);
         } else {
             fragmentHelper.replaceFragment(fragment, tag);

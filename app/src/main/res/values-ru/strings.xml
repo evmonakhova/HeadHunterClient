@@ -4,4 +4,11 @@
     <string name="search_hint">Поиск</string>
     <string name="download_more">Загрузить еще</string>
     <string name="unknown_salary">з/п не указана</string>
+    <string name="need_external_storage_permission">Перейдите, пожалуйста, в Настройки и разрешите доступ к Хранилищу.</string>
+    <string name="network_unavailable">Сеть недоступна, загрузка данных из кэша</string>
+    <string name="no_results">Вакансии не найдены</string>
+    <string name="ok">OK</string>
+    <string name="no_internet_no_results">Не удалось выполнить поиск. Отсутствует интернет-соединение</string>
+    <string name="clear">Очистить</string>
+    <string name="edit">Редактировать</string>
 </resources>

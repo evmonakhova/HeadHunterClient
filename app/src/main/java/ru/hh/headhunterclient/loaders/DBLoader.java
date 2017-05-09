@@ -2,13 +2,15 @@ package ru.hh.headhunterclient.loaders;
 
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
+
+import java.util.ArrayList;
 import java.util.List;
 
-import ru.hh.headhunterclient.cache.orm.AddressORM;
-import ru.hh.headhunterclient.cache.orm.AreaORM;
-import ru.hh.headhunterclient.cache.orm.EmployerORM;
-import ru.hh.headhunterclient.cache.orm.MetroORM;
-import ru.hh.headhunterclient.cache.orm.VacancyORM;
+import ru.hh.headhunterclient.database.orm.AddressORM;
+import ru.hh.headhunterclient.database.orm.AreaORM;
+import ru.hh.headhunterclient.database.orm.EmployerORM;
+import ru.hh.headhunterclient.database.orm.MetroORM;
+import ru.hh.headhunterclient.database.orm.VacancyORM;
 import ru.hh.headhunterclient.model.Address;
 import ru.hh.headhunterclient.model.Metro;
 import ru.hh.headhunterclient.model.Vacancy;
@@ -31,6 +33,9 @@ public class DBLoader extends AsyncTaskLoader<List<Vacancy>> {
     @Override
     public List<Vacancy> loadInBackground() {
         List<Vacancy> vacancies = VacancyORM.getVacancies(mContext);
+        if (vacancies == null) {
+            return new ArrayList<>();
+        }
         for (Vacancy vacancy: vacancies) {
             vacancy.setArea(AreaORM.findAreaById(mContext, vacancy.getArea().getId()));
             int addressId = vacancy.getAddress().getId();

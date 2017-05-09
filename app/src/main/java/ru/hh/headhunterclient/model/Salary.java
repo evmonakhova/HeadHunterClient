@@ -34,6 +34,17 @@ public class Salary {
         this.currency = currency;
     }
 
+    public boolean isSalaryUnkhown() {
+        if (from == null) {
+            if (to == null || to == 0) {
+                return true;
+            }
+        } else if (from == 0) {
+            return to == null || to == 0;
+        }
+        return false;
+    }
+
     @Override
     public String toString() {
         if (from != null && from != 0) {

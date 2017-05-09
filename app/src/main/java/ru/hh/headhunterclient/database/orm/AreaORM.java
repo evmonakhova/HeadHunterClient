@@ -1,4 +1,4 @@
-package ru.hh.headhunterclient.cache.orm;
+package ru.hh.headhunterclient.database.orm;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -6,7 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import ru.hh.headhunterclient.cache.DatabaseWrapper;
+import ru.hh.headhunterclient.database.DatabaseWrapper;
 import ru.hh.headhunterclient.model.Area;
 
 /**
@@ -36,18 +36,18 @@ public class AreaORM {
             "DROP TABLE IF EXISTS " + TABLE_NAME;
 
     public static Area findAreaById(Context context, long areaId) {
-        DatabaseWrapper databaseWrapper = new DatabaseWrapper(context);
+        DatabaseWrapper databaseWrapper = DatabaseWrapper.getInstance(context);
         SQLiteDatabase database = databaseWrapper.getReadableDatabase();
 
         Area area = null;
         if (database != null) {
-            Log.i(TAG, String.format("Loading area [%s]", areaId));
+//            Log.i(TAG, String.format("Loading area [%s]", areaId));
             Cursor cursor = database.rawQuery(String.format("SELECT * FROM %s WHERE %s = %s",
                     TABLE_NAME, COLUMN_ID, areaId), null);
             if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
                 area = cursorToArea(cursor);
-                Log.i(TAG, "Area loaded successfully!");
+//                Log.i(TAG, "Area loaded successfully!");
             }
             database.close();
         }
@@ -58,18 +58,18 @@ public class AreaORM {
     public static void insertArea(Context context, Area area) {
         if (area != null) {
             if (findAreaById(context, area.getId()) != null) {
-                Log.i(TAG, "Area already exists in database, not inserting!");
+//                Log.i(TAG, "Area already exists in database, not inserting!");
                 return;
             }
 
-            DatabaseWrapper databaseWrapper = new DatabaseWrapper(context);
+            DatabaseWrapper databaseWrapper = DatabaseWrapper.getInstance(context);
             SQLiteDatabase database = databaseWrapper.getWritableDatabase();
             ContentValues areaValues = areaToContentValues(area);
 
             try {
                 if (database != null) {
                     long areaId = database.insert(TABLE_NAME, "null", areaValues);
-                    Log.i(TAG, String.format("Inserted new Area with ID: %s", areaId));
+//                    Log.i(TAG, String.format("Inserted new Area with ID: %s", areaId));
                 }
             } catch (NullPointerException ex) {
                 Log.i(TAG, String.format("Failed to insert Area with ID: %s", area.getId()));

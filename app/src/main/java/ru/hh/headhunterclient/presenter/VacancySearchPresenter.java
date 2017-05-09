@@ -1,5 +1,6 @@
 package ru.hh.headhunterclient.presenter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -7,6 +8,7 @@ import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import com.google.gson.Gson;
 
@@ -17,33 +19,30 @@ import ru.hh.headhunterclient.loaders.DBLoader;
 import ru.hh.headhunterclient.model.SearchData;
 import ru.hh.headhunterclient.model.Vacancy;
 import ru.hh.headhunterclient.loaders.HttpLoader;
+import ru.hh.headhunterclient.utils.PermissionsHelper;
 import ru.hh.headhunterclient.view.IView;
 
 /**
  * Created by alena on 06.05.2017.
  */
 
-public class JobSearchPresenter implements IPresenter {
+public class VacancySearchPresenter implements IPresenter {
 
-    private static final String TAG = JobSearchPresenter.class.getSimpleName();
+    private static final String TAG = VacancySearchPresenter.class.getSimpleName();
 
     private IView mView;
     private Context mContext;
     private HttpLoader mHttpLoader;
     private DBLoader mDbLoader;
 
-    public JobSearchPresenter(Context context) {
+    public VacancySearchPresenter(Context context) {
         mContext = context;
     }
 
     @Override
     public void onCreate() {
         initLoaders();
-        if (isNetAvailable()) {
-            mHttpLoader.forceLoad();
-        } else {
-            mDbLoader.forceLoad();
-        }
+        checkPermissionAndLoadData(false);
     }
 
     @Override
@@ -53,14 +52,10 @@ public class JobSearchPresenter implements IPresenter {
 
     @Override
     public void requestJobs(String keyword) {
-//        mHttpLoader.setKeyword(keyword);
         initLoaders();
+        mHttpLoader.setKeyword(keyword);
         mView.clear();
-        if (isNetAvailable()) {
-            mHttpLoader.forceLoad();
-        } else {
-            mDbLoader.forceLoad();
-        }
+        checkPermissionAndLoadData(false);
     }
 
     @Override
@@ -71,11 +66,7 @@ public class JobSearchPresenter implements IPresenter {
         initLoaders();
         mView.showProgress(true);
         mHttpLoader.setPage(page);
-        if (isNetAvailable()) {
-            mHttpLoader.forceLoad();
-        } else {
-            mView.showProgress(false);
-        }
+        checkPermissionAndLoadData(true);
     }
 
     private LoaderManager.LoaderCallbacks<String> httpCallback =
@@ -89,12 +80,21 @@ public class JobSearchPresenter implements IPresenter {
         public void onLoadFinished(Loader<String> loader, String json) {
             Gson gson = new Gson();
             SearchData data = gson.fromJson(json, SearchData.class);
-            List<Vacancy> items = data.getItems();
-            mView.loadItems(items);
+            if (data != null) {
+                List<Vacancy> items = data.getItems();
+                if (items != null && items.size() > 0) {
+                    mView.loadItems(items);
+                    mView.showResultsList();
+                    CacheDataAsyncTask cacheDataAsyncTask = new CacheDataAsyncTask(mContext);
+                    cacheDataAsyncTask.executeContent(items);
+                } else {
+                    mView.showNoResultsText();
+                }
+            } else {
+                mView.showNoResultsText();
+            }
             mView.stopRefreshing();
             mView.showProgress(false);
-            CacheDataAsyncTask cacheDataAsyncTask = new CacheDataAsyncTask(mContext);
-            cacheDataAsyncTask.executeContent(items);
         }
 
         @Override
@@ -112,7 +112,12 @@ public class JobSearchPresenter implements IPresenter {
 
         @Override
         public void onLoadFinished(Loader<List<Vacancy>> loader, List<Vacancy> data) {
-            mView.loadItems(data);
+            if (data != null && data.size() > 0) {
+                mView.loadItems(data);
+                mView.showResultsList();
+            } else {
+                mView.showNoInternetText();
+            }
             mView.stopRefreshing();
             mView.showProgress(false);
         }
@@ -141,5 +146,32 @@ public class JobSearchPresenter implements IPresenter {
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
         return netInfo != null && netInfo.isConnectedOrConnecting();
+    }
+
+    private void checkPermissionAndLoadData(final boolean isLoadMore) {
+        PermissionsHelper.IRequestPermissionListener listener =
+                new PermissionsHelper.IRequestPermissionListener() {
+            @Override
+            public void result(boolean granted) {
+                if (granted){
+                    if (isNetAvailable()) {
+                        mHttpLoader.forceLoad();
+                    } else {
+                        mView.onNetUnavailableMessage();
+                        if (isLoadMore) {
+                            mView.showProgress(false);
+                            mView.stopRefreshing();
+                        } else {
+                            mDbLoader.forceLoad();
+                        }
+                    }
+                } else {
+                    mView.showNoInternetText();
+                }
+            }
+        };
+        if (PermissionsHelper.checkExternalStoragePermission(listener, (Activity) mContext)) {
+            listener.result(true);
+        }
     }
 }

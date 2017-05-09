@@ -1,4 +1,4 @@
-package ru.hh.headhunterclient.cache.orm;
+package ru.hh.headhunterclient.database.orm;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -6,7 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import ru.hh.headhunterclient.cache.DatabaseWrapper;
+import ru.hh.headhunterclient.database.DatabaseWrapper;
 import ru.hh.headhunterclient.model.Metro;
 
 /**
@@ -43,18 +43,18 @@ public class MetroORM {
             "DROP TABLE IF EXISTS " + TABLE_NAME;
 
     public static Metro findMetroById(Context context, Double metroId) {
-        DatabaseWrapper databaseWrapper = new DatabaseWrapper(context);
+        DatabaseWrapper databaseWrapper = DatabaseWrapper.getInstance(context);
         SQLiteDatabase database = databaseWrapper.getReadableDatabase();
 
         Metro metro = null;
         if (database != null) {
-            Log.i(TAG, String.format("Loading metro [%s]", metroId));
+//            Log.i(TAG, String.format("Loading metro [%s]", metroId));
             Cursor cursor = database.rawQuery(String.format("SELECT * FROM %s WHERE %s = %s",
                     TABLE_NAME, COLUMN_STATION_ID, metroId), null);
             if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
                 metro = cursorToMetro(cursor);
-                Log.i(TAG, "Metro loaded successfully!");
+//                Log.i(TAG, "Metro loaded successfully!");
             }
             database.close();
         }
@@ -65,18 +65,18 @@ public class MetroORM {
     public static void insertMetro(Context context, Metro metro) {
         if (metro != null) {
             if (findMetroById(context, metro.getStationId()) != null) {
-                Log.i(TAG, "Metro already exists in database, not inserting!");
+//                Log.i(TAG, "Metro already exists in database, not inserting!");
                 return;
             }
 
             ContentValues metroValues = metroToContentValues(metro);
-            DatabaseWrapper databaseWrapper = new DatabaseWrapper(context);
+            DatabaseWrapper databaseWrapper = DatabaseWrapper.getInstance(context);
             SQLiteDatabase database = databaseWrapper.getWritableDatabase();
 
             try {
                 if (database != null) {
                     long metroId = database.insert(MetroORM.TABLE_NAME, "null", metroValues);
-                    Log.i(TAG, String.format("Inserted new Metro with ID: %s", metroId));
+//                    Log.i(TAG, String.format("Inserted new Metro with ID: %s", metroId));
                 }
             } catch (NullPointerException ex) {
                 Log.i(TAG, String.format("Failed to insert Metro with ID: %s", metro.getStationId()));

@@ -4,11 +4,11 @@ import android.content.Context;
 
 import java.util.List;
 
-import ru.hh.headhunterclient.cache.orm.AddressORM;
-import ru.hh.headhunterclient.cache.orm.AreaORM;
-import ru.hh.headhunterclient.cache.orm.EmployerORM;
-import ru.hh.headhunterclient.cache.orm.MetroORM;
-import ru.hh.headhunterclient.cache.orm.VacancyORM;
+import ru.hh.headhunterclient.database.orm.AddressORM;
+import ru.hh.headhunterclient.database.orm.AreaORM;
+import ru.hh.headhunterclient.database.orm.EmployerORM;
+import ru.hh.headhunterclient.database.orm.MetroORM;
+import ru.hh.headhunterclient.database.orm.VacancyORM;
 import ru.hh.headhunterclient.model.Address;
 import ru.hh.headhunterclient.model.Vacancy;
 

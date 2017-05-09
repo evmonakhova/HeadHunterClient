@@ -1,4 +1,4 @@
-package ru.hh.headhunterclient.cache.orm;
+package ru.hh.headhunterclient.database.orm;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -6,7 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import ru.hh.headhunterclient.cache.DatabaseWrapper;
+import ru.hh.headhunterclient.database.DatabaseWrapper;
 import ru.hh.headhunterclient.model.Employer;
 import ru.hh.headhunterclient.model.LogoUrls;
 
@@ -51,18 +51,18 @@ public class EmployerORM {
 
 
     public static Employer findEmployerById(Context context, long employerId) {
-        DatabaseWrapper databaseWrapper = new DatabaseWrapper(context);
+        DatabaseWrapper databaseWrapper = DatabaseWrapper.getInstance(context);
         SQLiteDatabase database = databaseWrapper.getReadableDatabase();
 
         Employer employer = null;
         if (database != null) {
-            Log.i(TAG, String.format("Loading employer [%s]", employerId));
+//            Log.i(TAG, String.format("Loading employer [%s]", employerId));
             Cursor cursor = database.rawQuery(String.format("SELECT * FROM %s WHERE %s = %s",
                     TABLE_NAME, COLUMN_ID, employerId), null);
             if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
                 employer = cursorToEmployer(cursor);
-                Log.i(TAG, "Employer loaded successfully!");
+//                Log.i(TAG, "Employer loaded successfully!");
             }
             database.close();
         }
@@ -74,18 +74,18 @@ public class EmployerORM {
     public static void insertEmployer(Context context, Employer employer) {
         if (employer != null) {
             if (findEmployerById(context, employer.getId()) != null) {
-                Log.i(TAG, "Employer already exists in database, not inserting!");
+//                Log.i(TAG, "Employer already exists in database, not inserting!");
                 return;
             }
 
             ContentValues values = employerToContentValues(employer);
-            DatabaseWrapper databaseWrapper = new DatabaseWrapper(context);
+            DatabaseWrapper databaseWrapper = DatabaseWrapper.getInstance(context);
             SQLiteDatabase database = databaseWrapper.getWritableDatabase();
 
             try {
                 if (database != null) {
                     long id = database.insert(EmployerORM.TABLE_NAME, "null", values);
-                    Log.i(TAG, String.format("Inserted new Employer with ID: %s", id));
+//                    Log.i(TAG, String.format("Inserted new Employer with ID: %s", id));
                 }
             } catch (NullPointerException ex) {
                 Log.i(TAG, String.format("Failed to insert Employer with ID: %s", employer.getId()));

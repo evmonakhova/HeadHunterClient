@@ -17,4 +17,12 @@ public interface IView {
     void showProgress(boolean show);
 
     void stopRefreshing();
+
+    void showNoResultsText();
+
+    void showNoInternetText();
+
+    void showResultsList();
+
+    void onNetUnavailableMessage();
 }

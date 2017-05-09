@@ -12,6 +12,7 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
 
 /**
  * Created by alena on 07.05.2017.
@@ -22,10 +23,9 @@ public class HttpLoader extends AsyncTaskLoader<String> {
     private static final String TAG = HttpLoader.class.getSimpleName();
 
     private static final String BASE_URL = "https://api.hh.ru/vacancies";
-    private static final String KEYWORD = "Android";
     private static final String PER_PAGE = "20";
 
-    private String mKeyword;
+    private String mKeyword = "Android";
     private int mPage = 0;
 
     public HttpLoader(Context context) {
@@ -38,8 +38,9 @@ public class HttpLoader extends AsyncTaskLoader<String> {
         String response;
 
         try {
-            URI uri = buildURI(BASE_URL, KEYWORD, mPage, PER_PAGE);
-            Log.d(TAG, String.format("loadInBackground. path: %s", uri.toURL()));
+            String encodedKeyword = URLEncoder.encode(mKeyword, "UTF-8");
+            URI uri = buildURI(BASE_URL, encodedKeyword, mPage, PER_PAGE);
+            Log.i(TAG, String.format("loadInBackground. path: %s", uri.toURL()));
             URL url = uri.toURL();
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");

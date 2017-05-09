@@ -22,11 +22,11 @@ import ru.hh.headhunterclient.model.Vacancy;
  * Created by alena on 06.05.2017.
  */
 
-public class JobListAdapter extends RecyclerView.Adapter<JobListAdapter.ViewHolder> {
+public class VacanciesListAdapter extends RecyclerView.Adapter<VacanciesListAdapter.ViewHolder> {
 
     private List<Vacancy> items;
 
-    public JobListAdapter() {
+    public VacanciesListAdapter() {
         items = new ArrayList<>();
     }
 
@@ -98,8 +98,7 @@ public class JobListAdapter extends RecyclerView.Adapter<JobListAdapter.ViewHold
                 Address address = item.getAddress();
 
                 mVacancyTitle.setText(item.getName());
-                if (salary == null || (salary.getFrom() == null && salary.getTo() == null)
-                        || (salary.getFrom() == 0 && salary.getTo() == 0)) {
+                if (salary == null || salary.isSalaryUnkhown()) {
                     mSalary.setText(R.string.unknown_salary);
                 } else {
                     mSalary.setText(salary.toString());
@@ -109,7 +108,8 @@ public class JobListAdapter extends RecyclerView.Adapter<JobListAdapter.ViewHold
                 if (employer != null) {
                     sbInfo.append(employer.getName());
                 }
-                if (department != null && department.getName() != null){
+                if (department != null && department.getName() != null
+                        && !department.getName().equals("")){
                     sbInfo.append("::").append(department.getName());
                 }
                 sbInfo.append(", ");

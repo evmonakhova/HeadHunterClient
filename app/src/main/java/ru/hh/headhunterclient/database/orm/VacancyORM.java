@@ -1,4 +1,4 @@
-package ru.hh.headhunterclient.cache.orm;
+package ru.hh.headhunterclient.database.orm;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -9,7 +9,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-import ru.hh.headhunterclient.cache.DatabaseWrapper;
+import ru.hh.headhunterclient.database.DatabaseWrapper;
 import ru.hh.headhunterclient.model.Address;
 import ru.hh.headhunterclient.model.Area;
 import ru.hh.headhunterclient.model.Department;
@@ -29,10 +29,10 @@ public class VacancyORM {
 
     private static final String COMMA_SEP = ", ";
     private static final String TYPE_INTEGER_PRIMARY_KEY = "INTEGER PRIMARY KEY";
-    private static final String TYPE_TEXT = "TEXT";
+    private static final String TYPE_TEXT = "NOT NULL DEFAULT ''";
     private static final String TYPE_INTEGER = "INTEGER";
 
-    private static final String TABLE_NAME = "vacancy";
+    public static final String TABLE_NAME = "vacancy";
     private static final String COLUMN_ID = "id";
     private static final String COLUMN_NAME = "name";
     private static final String COLUMN_SALARY_FROM = "salary_from";
@@ -44,7 +44,7 @@ public class VacancyORM {
     private static final String COLUMN_DEPARTMENT_ID = "department_id";
     private static final String COLUMN_DEPARTMENT_NAME = "department_name";
     private static final String COLUMN_TYPE_ID = "type_id";
-    private static final String COLUMN_TYPE_NAME= "type_name";
+    private static final String COLUMN_TYPE_NAME = "type_name";
     private static final String COLUMN_URL = "url";
     private static final String COLUMN_ALTERNATE_URL = "alternate_url";
     private static final String COLUMN_APPLY_ALTERNATE_URL = "apply_alternate_url";
@@ -53,6 +53,13 @@ public class VacancyORM {
     private static final String COLUMN_ARCHIVED = "archived";
     private static final String COLUMN_SNIPPET_REQUIREMENT = "snippet_requirement";
     private static final String COLUMN_SNIPPET_RESPONSIBILITY = "snippet_responsibility";
+
+    public static final String[] FIELDS = { COLUMN_ID, COLUMN_NAME, COLUMN_SALARY_FROM,
+            COLUMN_SALARY_TO, COLUMN_CURRENCY, COLUMN_AREA_ID, COLUMN_ADDRESS_ID,
+            COLUMN_EMPLOYER_ID, COLUMN_DEPARTMENT_ID, COLUMN_DEPARTMENT_NAME,
+            COLUMN_TYPE_ID, COLUMN_TYPE_NAME, COLUMN_URL, COLUMN_ALTERNATE_URL,
+            COLUMN_APPLY_ALTERNATE_URL, COLUMN_PUBLISHED_AT, COLUMN_RESPONSE_LETTER_REQUIRED,
+            COLUMN_ARCHIVED, COLUMN_SNIPPET_REQUIREMENT, COLUMN_SNIPPET_RESPONSIBILITY};
 
     public static final String SQL_CREATE_VACANCY_TABLE =
             "CREATE TABLE " + TABLE_NAME + " (" +
@@ -82,18 +89,18 @@ public class VacancyORM {
             "DROP TABLE IF EXISTS " + TABLE_NAME;
 
     public static Vacancy findVacancyById(Context context, Integer vacancyId) {
-        DatabaseWrapper databaseWrapper = new DatabaseWrapper(context);
+        DatabaseWrapper databaseWrapper = DatabaseWrapper.getInstance(context);
         SQLiteDatabase database = databaseWrapper.getReadableDatabase();
 
         Vacancy vacancy = null;
         if (database != null) {
-            Log.i(TAG, String.format("Loading vacancy [%s]", vacancyId));
+//            Log.i(TAG, String.format("Loading vacancy [%s]", vacancyId));
             Cursor cursor = database.rawQuery(String.format("SELECT * FROM %s WHERE %s = %s",
                     TABLE_NAME, COLUMN_ID, vacancyId), null);
             if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
                 vacancy = cursorToVacancy(cursor);
-                Log.i(TAG, "Vacancy loaded successfully!");
+//                Log.i(TAG, "Vacancy loaded successfully!");
             }
             database.close();
         }
@@ -103,18 +110,18 @@ public class VacancyORM {
 
     public static void insertVacancy(Context context, Vacancy vacancy) {
         if (findVacancyById(context, vacancy.getId()) != null) {
-            Log.i(TAG, "Vacancy already exists in database, not inserting!");
+//            Log.i(TAG, "Vacancy already exists in database, not inserting!");
             return;
         }
 
         ContentValues vacancyValues = vacancyToContentValues(vacancy);
-        DatabaseWrapper databaseWrapper = new DatabaseWrapper(context);
+        DatabaseWrapper databaseWrapper = DatabaseWrapper.getInstance(context);
         SQLiteDatabase database = databaseWrapper.getWritableDatabase();
 
         try {
             if (database != null) {
                 long vacancyId = database.insert(TABLE_NAME, "null", vacancyValues);
-                Log.i(TAG, "Inserted new Vacancy with ID: " + vacancyId);
+//                Log.i(TAG, "Inserted new Vacancy with ID: " + vacancyId);
             }
         } catch (NullPointerException ex) {
             Log.i(TAG, String.format("Failed to insert Vacancy with ID: %s", vacancy.getId()));
@@ -126,15 +133,14 @@ public class VacancyORM {
     }
 
     public static List<Vacancy> getVacancies(Context context) {
-        DatabaseWrapper databaseWrapper = new DatabaseWrapper(context);
+        DatabaseWrapper databaseWrapper = DatabaseWrapper.getInstance(context);
         SQLiteDatabase database = databaseWrapper.getReadableDatabase();
 
         List<Vacancy> postList = null;
 
         if(database != null) {
             Cursor cursor = database.rawQuery(String.format("SELECT * FROM %s", TABLE_NAME), null);
-
-            Log.i(TAG, String.format("Loaded %s Vacancies...", cursor.getCount()));
+//            Log.i(TAG, String.format("Loaded %s Vacancies...", cursor.getCount()));
             int count = 20;
             if (cursor.getCount() > 0) {
                 postList = new ArrayList<>();
@@ -145,7 +151,7 @@ public class VacancyORM {
                     cursor.moveToNext();
                     count--;
                 }
-                Log.i(TAG, "Vacancies loaded successfully.");
+//                Log.i(TAG, "Vacancies loaded successfully.");
             }
 
             database.close();
@@ -162,13 +168,11 @@ public class VacancyORM {
 
         Salary salary = vacancy.getSalary();
         if (salary != null) {
-            Integer salaryFrom = salary.getFrom();
-            if (salaryFrom != null) {
-                values.put(COLUMN_SALARY_FROM, salaryFrom);
+            if (salary.getFrom() != null) {
+                values.put(COLUMN_SALARY_FROM, salary.getFrom());
             }
-            Integer salaryTo = salary.getTo();
-            if (salaryTo != null) {
-                values.put(COLUMN_SALARY_TO, salaryTo);
+            if (salary.getTo() != null) {
+                values.put(COLUMN_SALARY_TO, salary.getTo());
             }
             values.put(COLUMN_CURRENCY, salary.getCurrency());
         }
@@ -195,17 +199,29 @@ public class VacancyORM {
             values.put(COLUMN_TYPE_NAME, type.getName());
         }
 
-        values.put(COLUMN_URL, vacancy.getUrl());
-        values.put(COLUMN_ALTERNATE_URL, vacancy.getAlternateUrl());
-        values.put(COLUMN_APPLY_ALTERNATE_URL, vacancy.getApplyAlternateUrl());
-        values.put(COLUMN_PUBLISHED_AT, vacancy.getPublishedAt());
+        if (vacancy.getUrl() != null) {
+            values.put(COLUMN_URL, vacancy.getUrl());
+        }
+        if (vacancy.getAlternateUrl() != null) {
+            values.put(COLUMN_ALTERNATE_URL, vacancy.getAlternateUrl());
+        }
+        if (vacancy.getApplyAlternateUrl() != null) {
+            values.put(COLUMN_APPLY_ALTERNATE_URL, vacancy.getApplyAlternateUrl());
+        }
+        if (vacancy.getPublishedAt() != null) {
+            values.put(COLUMN_PUBLISHED_AT, vacancy.getPublishedAt());
+        }
         values.put(COLUMN_RESPONSE_LETTER_REQUIRED, vacancy.isResponseLetterRequired() ? 1 : 0);
         values.put(COLUMN_ARCHIVED, vacancy.isArchived() ? 1 : 0);
 
         Snippet snippet = vacancy.getSnippet();
         if (snippet != null) {
-            values.put(COLUMN_SNIPPET_REQUIREMENT, snippet.getRequirement());
-            values.put(COLUMN_SNIPPET_RESPONSIBILITY, snippet.getResponsibility());
+            if (snippet.getRequirement() != null) {
+                values.put(COLUMN_SNIPPET_REQUIREMENT, snippet.getRequirement());
+            }
+            if (snippet.getResponsibility() != null) {
+                values.put(COLUMN_SNIPPET_RESPONSIBILITY, snippet.getResponsibility());
+            }
         }
 
         return values;
