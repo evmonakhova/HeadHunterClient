@@ -98,7 +98,8 @@ public class JobListAdapter extends RecyclerView.Adapter<JobListAdapter.ViewHold
                 Address address = item.getAddress();
 
                 mVacancyTitle.setText(item.getName());
-                if (salary == null) {
+                if (salary == null || (salary.getFrom() == null && salary.getTo() == null)
+                        || (salary.getFrom() == 0 && salary.getTo() == 0)) {
                     mSalary.setText(R.string.unknown_salary);
                 } else {
                     mSalary.setText(salary.toString());
@@ -108,7 +109,7 @@ public class JobListAdapter extends RecyclerView.Adapter<JobListAdapter.ViewHold
                 if (employer != null) {
                     sbInfo.append(employer.getName());
                 }
-                if (department != null){
+                if (department != null && department.getName() != null){
                     sbInfo.append("::").append(department.getName());
                 }
                 sbInfo.append(", ");

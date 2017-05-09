@@ -6,6 +6,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import ru.hh.headhunterclient.cache.DatabaseWrapper;
 import ru.hh.headhunterclient.model.Address;
 import ru.hh.headhunterclient.model.Area;
@@ -121,6 +124,36 @@ public class VacancyORM {
             }
         }
     }
+
+    public static List<Vacancy> getVacancies(Context context) {
+        DatabaseWrapper databaseWrapper = new DatabaseWrapper(context);
+        SQLiteDatabase database = databaseWrapper.getReadableDatabase();
+
+        List<Vacancy> postList = null;
+
+        if(database != null) {
+            Cursor cursor = database.rawQuery(String.format("SELECT * FROM %s", TABLE_NAME), null);
+
+            Log.i(TAG, String.format("Loaded %s Vacancies...", cursor.getCount()));
+            int count = 20;
+            if (cursor.getCount() > 0) {
+                postList = new ArrayList<>();
+                cursor.moveToFirst();
+                while (!cursor.isAfterLast() && count > 0) {
+                    Vacancy vacancy = cursorToVacancy(cursor);
+                    postList.add(vacancy);
+                    cursor.moveToNext();
+                    count--;
+                }
+                Log.i(TAG, "Vacancies loaded successfully.");
+            }
+
+            database.close();
+        }
+
+        return postList;
+    }
+
 
     private static ContentValues vacancyToContentValues(Vacancy vacancy) {
         ContentValues values = new ContentValues();

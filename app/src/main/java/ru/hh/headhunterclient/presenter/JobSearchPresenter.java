@@ -1,6 +1,8 @@
 package ru.hh.headhunterclient.presenter;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -10,13 +12,8 @@ import com.google.gson.Gson;
 
 import java.util.List;
 
-import ru.hh.headhunterclient.cache.orm.AddressORM;
-import ru.hh.headhunterclient.cache.orm.AreaORM;
-import ru.hh.headhunterclient.cache.orm.EmployerORM;
-import ru.hh.headhunterclient.cache.orm.MetroORM;
-import ru.hh.headhunterclient.cache.orm.VacancyORM;
 import ru.hh.headhunterclient.loaders.CacheDataAsyncTask;
-import ru.hh.headhunterclient.model.Address;
+import ru.hh.headhunterclient.loaders.DBLoader;
 import ru.hh.headhunterclient.model.SearchData;
 import ru.hh.headhunterclient.model.Vacancy;
 import ru.hh.headhunterclient.loaders.HttpLoader;
@@ -26,13 +23,14 @@ import ru.hh.headhunterclient.view.IView;
  * Created by alena on 06.05.2017.
  */
 
-public class JobSearchPresenter implements IPresenter, LoaderManager.LoaderCallbacks<String>{
+public class JobSearchPresenter implements IPresenter {
 
     private static final String TAG = JobSearchPresenter.class.getSimpleName();
 
     private IView mView;
     private Context mContext;
     private HttpLoader mHttpLoader;
+    private DBLoader mDbLoader;
 
     public JobSearchPresenter(Context context) {
         mContext = context;
@@ -40,8 +38,12 @@ public class JobSearchPresenter implements IPresenter, LoaderManager.LoaderCallb
 
     @Override
     public void onCreate() {
-        initHttpLoader();
-        mHttpLoader.forceLoad();
+        initLoaders();
+        if (isNetAvailable()) {
+            mHttpLoader.forceLoad();
+        } else {
+            mDbLoader.forceLoad();
+        }
     }
 
     @Override
@@ -52,9 +54,13 @@ public class JobSearchPresenter implements IPresenter, LoaderManager.LoaderCallb
     @Override
     public void requestJobs(String keyword) {
 //        mHttpLoader.setKeyword(keyword);
-        initHttpLoader();
+        initLoaders();
         mView.clear();
-        mHttpLoader.forceLoad();
+        if (isNetAvailable()) {
+            mHttpLoader.forceLoad();
+        } else {
+            mDbLoader.forceLoad();
+        }
     }
 
     @Override
@@ -62,39 +68,78 @@ public class JobSearchPresenter implements IPresenter, LoaderManager.LoaderCallb
         if (page*20 >= 2000){
             return;
         }
-        initHttpLoader();
+        initLoaders();
         mView.showProgress(true);
         mHttpLoader.setPage(page);
-        mHttpLoader.forceLoad();
+        if (isNetAvailable()) {
+            mHttpLoader.forceLoad();
+        } else {
+            mView.showProgress(false);
+        }
     }
 
-    @Override
-    public Loader<String> onCreateLoader(int id, Bundle args) {
-        return new HttpLoader(mContext);
-    }
+    private LoaderManager.LoaderCallbacks<String> httpCallback =
+            new LoaderManager.LoaderCallbacks<String>() {
+        @Override
+        public Loader<String> onCreateLoader(int id, Bundle args) {
+            return new HttpLoader(mContext);
+        }
 
-    @Override
-    public void onLoadFinished(Loader<String> loader, String json) {
-        Gson gson = new Gson();
-        SearchData data = gson.fromJson(json, SearchData.class);
-        List<Vacancy> items = data.getItems();
-        mView.loadItems(items);
-        mView.stopRefreshing();
-        mView.showProgress(false);
-        CacheDataAsyncTask cacheDataAsyncTask = new CacheDataAsyncTask(mContext);
-        cacheDataAsyncTask.executeContent(items);
-    }
+        @Override
+        public void onLoadFinished(Loader<String> loader, String json) {
+            Gson gson = new Gson();
+            SearchData data = gson.fromJson(json, SearchData.class);
+            List<Vacancy> items = data.getItems();
+            mView.loadItems(items);
+            mView.stopRefreshing();
+            mView.showProgress(false);
+            CacheDataAsyncTask cacheDataAsyncTask = new CacheDataAsyncTask(mContext);
+            cacheDataAsyncTask.executeContent(items);
+        }
 
-    @Override
-    public void onLoaderReset(Loader<String> loader) {
-        mView.clear();
-    }
+        @Override
+        public void onLoaderReset(Loader<String> loader) {
+            mView.clear();
+        }
+    };
 
-    private void initHttpLoader() {
+    private LoaderManager.LoaderCallbacks<List<Vacancy>> dbCallback =
+            new LoaderManager.LoaderCallbacks<List<Vacancy>>() {
+        @Override
+        public Loader<List<Vacancy>> onCreateLoader(int id, Bundle args) {
+            return new DBLoader(mContext);
+        }
+
+        @Override
+        public void onLoadFinished(Loader<List<Vacancy>> loader, List<Vacancy> data) {
+            mView.loadItems(data);
+            mView.stopRefreshing();
+            mView.showProgress(false);
+        }
+
+        @Override
+        public void onLoaderReset(Loader<List<Vacancy>> loader) {
+            mView.clear();
+        }
+    };
+
+    private void initLoaders() {
         if (mHttpLoader == null) {
             mHttpLoader = (HttpLoader) ((AppCompatActivity)mContext)
                     .getSupportLoaderManager()
-                    .initLoader(0, null, this);
+                    .initLoader(0, null, httpCallback);
         }
+        if (mDbLoader == null) {
+            mDbLoader = (DBLoader) ((AppCompatActivity)mContext)
+                    .getSupportLoaderManager()
+                    .initLoader(1, null, dbCallback);
+        }
+    }
+
+    private boolean isNetAvailable() {
+        ConnectivityManager cm = (ConnectivityManager) mContext
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 }

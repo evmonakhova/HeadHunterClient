@@ -36,8 +36,8 @@ public class Salary {
 
     @Override
     public String toString() {
-        if (from != null) {
-            if (to == null) {
+        if (from != null && from != 0) {
+            if (to == null || to == 0) {
                 return String.format("от %s %s", from, currency);
             } else {
                 return String.format("%s - %s %s", from, to, currency);
