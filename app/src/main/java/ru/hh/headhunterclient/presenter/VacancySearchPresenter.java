@@ -2,20 +2,21 @@ package ru.hh.headhunterclient.presenter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 
 import com.google.gson.Gson;
 
 import java.util.List;
 
+import ru.hh.headhunterclient.database.contract.VacanciesContract;
 import ru.hh.headhunterclient.loaders.CacheDataAsyncTask;
-import ru.hh.headhunterclient.loaders.DBLoader;
 import ru.hh.headhunterclient.model.SearchData;
 import ru.hh.headhunterclient.model.Vacancy;
 import ru.hh.headhunterclient.loaders.HttpLoader;
@@ -33,7 +34,7 @@ public class VacancySearchPresenter implements IPresenter {
     private IView mView;
     private Context mContext;
     private HttpLoader mHttpLoader;
-    private DBLoader mDbLoader;
+    private CursorLoader mCursorLoader;
 
     public VacancySearchPresenter(Context context) {
         mContext = context;
@@ -42,7 +43,7 @@ public class VacancySearchPresenter implements IPresenter {
     @Override
     public void onCreate() {
         initLoaders();
-        checkPermissionAndLoadData(false);
+        loadData(false);
     }
 
     @Override
@@ -54,8 +55,8 @@ public class VacancySearchPresenter implements IPresenter {
     public void requestJobs(String keyword) {
         initLoaders();
         mHttpLoader.setKeyword(keyword);
-        mView.clear();
-        checkPermissionAndLoadData(false);
+        mView.clearAdapters();
+        loadData(false);
     }
 
     @Override
@@ -66,7 +67,7 @@ public class VacancySearchPresenter implements IPresenter {
         initLoaders();
         mView.showProgress(true);
         mHttpLoader.setPage(page);
-        checkPermissionAndLoadData(true);
+        loadData(true);
     }
 
     private LoaderManager.LoaderCallbacks<String> httpCallback =
@@ -80,41 +81,41 @@ public class VacancySearchPresenter implements IPresenter {
         public void onLoadFinished(Loader<String> loader, String json) {
             Gson gson = new Gson();
             SearchData data = gson.fromJson(json, SearchData.class);
+            mView.stopRefreshing();
+            mView.showProgress(false);
             if (data != null) {
                 List<Vacancy> items = data.getItems();
                 if (items != null && items.size() > 0) {
-                    mView.loadItems(items);
-                    mView.showResultsList();
-                    CacheDataAsyncTask cacheDataAsyncTask = new CacheDataAsyncTask(mContext);
-                    cacheDataAsyncTask.executeContent(items);
+                    mView.loadItemsToListAdapter(items);
+                    mView.showResultsRecyclerView();
+                    cacheData(items);
                 } else {
                     mView.showNoResultsText();
                 }
             } else {
                 mView.showNoResultsText();
             }
-            mView.stopRefreshing();
-            mView.showProgress(false);
         }
 
         @Override
         public void onLoaderReset(Loader<String> loader) {
-            mView.clear();
+            mView.clearAdapters();
         }
     };
 
-    private LoaderManager.LoaderCallbacks<List<Vacancy>> dbCallback =
-            new LoaderManager.LoaderCallbacks<List<Vacancy>>() {
+    private LoaderManager.LoaderCallbacks<Cursor> cursorCallback =
+            new LoaderManager.LoaderCallbacks<Cursor>() {
         @Override
-        public Loader<List<Vacancy>> onCreateLoader(int id, Bundle args) {
-            return new DBLoader(mContext);
+        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            return new CursorLoader(mContext, VacanciesContract.URI,
+                    null, null, null, null);
         }
 
         @Override
-        public void onLoadFinished(Loader<List<Vacancy>> loader, List<Vacancy> data) {
-            if (data != null && data.size() > 0) {
-                mView.loadItems(data);
-                mView.showResultsList();
+        public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+            if (data != null && data.getCount() > 0) {
+                mView.swapCursor(data);
+                mView.showResultsRecyclerView();
             } else {
                 mView.showNoInternetText();
             }
@@ -123,21 +124,18 @@ public class VacancySearchPresenter implements IPresenter {
         }
 
         @Override
-        public void onLoaderReset(Loader<List<Vacancy>> loader) {
-            mView.clear();
+        public void onLoaderReset(Loader<Cursor> loader) {
+            mView.swapCursor(null);
         }
     };
 
     private void initLoaders() {
+        LoaderManager lm = ((AppCompatActivity)mContext).getSupportLoaderManager();
         if (mHttpLoader == null) {
-            mHttpLoader = (HttpLoader) ((AppCompatActivity)mContext)
-                    .getSupportLoaderManager()
-                    .initLoader(0, null, httpCallback);
+            mHttpLoader = (HttpLoader) lm.initLoader(0, null, httpCallback);
         }
-        if (mDbLoader == null) {
-            mDbLoader = (DBLoader) ((AppCompatActivity)mContext)
-                    .getSupportLoaderManager()
-                    .initLoader(1, null, dbCallback);
+        if (mCursorLoader == null) {
+            mCursorLoader = (CursorLoader) lm.initLoader(2, null, cursorCallback);
         }
     }
 
@@ -148,28 +146,49 @@ public class VacancySearchPresenter implements IPresenter {
         return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
-    private void checkPermissionAndLoadData(final boolean isLoadMore) {
+    private void loadData(final boolean isLoadMore) {
+        if (isNetAvailable()) {
+            mHttpLoader.forceLoad();
+        } else {
+            if (isLoadMore) {
+                mView.onNetUnavailableMessage();
+                mView.showProgress(false);
+                mView.stopRefreshing();
+            } else {
+                loadFromDB();
+            }
+        }
+    }
+
+    private void loadFromDB() {
         PermissionsHelper.IRequestPermissionListener listener =
                 new PermissionsHelper.IRequestPermissionListener() {
-            @Override
-            public void result(boolean granted) {
-                if (granted){
-                    if (isNetAvailable()) {
-                        mHttpLoader.forceLoad();
-                    } else {
-                        mView.onNetUnavailableMessage();
-                        if (isLoadMore) {
+                    @Override
+                    public void result(boolean granted) {
+                        if (granted) {
+                            mCursorLoader.forceLoad();
+                        } else {
                             mView.showProgress(false);
                             mView.stopRefreshing();
-                        } else {
-                            mDbLoader.forceLoad();
                         }
                     }
-                } else {
-                    mView.showNoInternetText();
-                }
-            }
-        };
+                };
+        if (PermissionsHelper.checkExternalStoragePermission(listener, (Activity) mContext)) {
+            listener.result(true);
+        }
+    }
+
+    private void cacheData(final List<Vacancy> items) {
+        PermissionsHelper.IRequestPermissionListener listener =
+                new PermissionsHelper.IRequestPermissionListener() {
+                    @Override
+                    public void result(boolean granted) {
+                        if (granted){
+                            new CacheDataAsyncTask(mContext)
+                                    .executeContent(items);
+                        }
+                    }
+                };
         if (PermissionsHelper.checkExternalStoragePermission(listener, (Activity) mContext)) {
             listener.result(true);
         }

@@ -1,5 +1,7 @@
 package ru.hh.headhunterclient.view;
 
+import android.database.Cursor;
+
 import java.util.List;
 
 import ru.hh.headhunterclient.model.Vacancy;
@@ -10,9 +12,11 @@ import ru.hh.headhunterclient.model.Vacancy;
 
 public interface IView {
 
-    void clear();
+    void clearAdapters();
 
-    void loadItems(List<Vacancy> vacancies);
+    void loadItemsToListAdapter(List<Vacancy> vacancies);
+
+    void swapCursor(Cursor cursor);
 
     void showProgress(boolean show);
 
@@ -22,7 +26,7 @@ public interface IView {
 
     void showNoInternetText();
 
-    void showResultsList();
+    void showResultsRecyclerView();
 
     void onNetUnavailableMessage();
 }

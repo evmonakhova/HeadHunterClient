@@ -8,6 +8,8 @@ import com.google.gson.annotations.SerializedName;
 
 public class Metro {
 
+    private int id;
+
     @SerializedName("station_id")
     private Double stationId;
     @SerializedName("station_name")
@@ -18,6 +20,10 @@ public class Metro {
     private String lineName;
     private Double lat;
     private Double lng;
+
+    public int getId() {
+        return id;
+    }
 
     public Double getStationId() {
         return stationId;
@@ -41,6 +47,10 @@ public class Metro {
 
     public Double getLng() {
         return lng;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public void setStationId(Double stationId) {

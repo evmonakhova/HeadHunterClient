@@ -4,7 +4,7 @@
     <string name="search_hint">Поиск</string>
     <string name="download_more">Загрузить еще</string>
     <string name="unknown_salary">з/п не указана</string>
-    <string name="need_external_storage_permission">Перейдите, пожалуйста, в Настройки и разрешите доступ к Хранилищу.</string>
+    <string name="need_external_storage_permission">Перейдите, пожалуйста, в Настройки и разрешите доступ к Хранилищу. Это необходимо для кэширования данных. </string>
     <string name="network_unavailable">Сеть недоступна, загрузка данных из кэша</string>
     <string name="no_results">Вакансии не найдены</string>
     <string name="ok">OK</string>

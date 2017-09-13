@@ -9,7 +9,7 @@
     <string name="download_more">Download more</string>
     <string name="unknown_salary">Salary is unknown</string>
 
-    <string name="need_external_storage_permission">Please proceed to Settings and grant the access to storage.</string>
+    <string name="need_external_storage_permission">Please proceed to Settings and grant the access to storage. It is necessary to cache data.</string>
     <string name="network_unavailable">Network unavailable, load data from cache</string>
     <string name="no_results">Vacancies not found</string>
     <string name="no_internet_no_results">Vacancies not found. No internet connection</string>
